@@ -1,26 +1,56 @@
-# Environment variables
+# Environment
 .env
+.env*
+!.env.example
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Dependency directories
+# Dependencies
 node_modules/
 
-# Logs and databases
+# Build outputs
+dist/
+build/
+coverage/
+
+# Local config
+config.js  # Only if it contains sensitive data
+
+# Logs
 *.log
 *.sqlite
+*.bin
 
-# Editor directories
+# Editors/IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
 
-/node_modules
-.env
+# OS-specific
 .DS_Store
-coverage
-dist
-build
+Thumbs.db
+Desktop.ini
+
+# Runtime/data
+.cache/
 .cacheAppData/
-OneDrive/
+
+# Virtualization
 .VirtualBox/
-*.bin
+
+# Local development
+*.local
+
+# Lock files (only include if NOT tracking exact dependency versions)
+package-lock.json
+yarn.lock
+
+# Testing
+jest.config.js
+cypress/
+
+# Docker
+docker-compose.override.yml

@@ -1,4 +1,5 @@
 # Environment
+.env
 .env*
 !.env.example
 .env.local
@@ -13,6 +14,9 @@ node_modules/
 dist/
 build/
 coverage/
+
+# Local config
+config.js  # Only if it contains sensitive data
 
 # Logs
 *.log

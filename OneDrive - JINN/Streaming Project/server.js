@@ -2,41 +2,50 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const path = require('path'); // Added path module
+const helmet = require('helmet'); // Security headers
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(helmet());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? 'https://your-frontend-domain.com' 
+    : 'http://localhost:3000'
+}));
 app.use(express.json());
 
 // TMDB Proxy Endpoint
 app.get('/api/tmdb', async (req, res) => {
-    try {
-        const { endpoint, ...queryParams } = req.query;
-        const response = await axios.get(
-            `https://api.themoviedb.org/3${endpoint}`, 
-            {
-                params: {
-                    api_key: process.env.TMDB_API_KEY,
-                    ...queryParams
-                }
-            }
-        );
-        res.json(response.data);
-    } catch (error) {
-        console.error('TMDB Proxy Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch from TMDB' });
-    }
+  try {
+    const { endpoint, ...queryParams } = req.query;
+    const response = await axios.get(
+      `https://api.themoviedb.org/3${endpoint}`, 
+      {
+        params: {
+          api_key: process.env.TMDB_API_KEY,
+          ...queryParams
+        }
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    console.error('TMDB Proxy Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch from TMDB' });
+  }
 });
 
-// Serve static files from React/Vue/Angular in production
+// Production configuration
 if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('client/build'));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-    });
+  const staticPath = path.join(__dirname, 'client/build');
+  app.use(express.static(staticPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
+  });
 }
 
-// Change this line in server.js
-const PORT = process.env.PORT || 3002; // Different port
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});
